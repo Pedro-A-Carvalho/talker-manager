@@ -100,6 +100,15 @@ router.post('/',
     await fs.writeFile(path.resolve('src', 'talker.json'), JSON.stringify(talkers, null, 2));
     res.status(201).json(newTalker);
   });
+  
+router.get('/search', validateUserLogged, async (req, res) => {
+  const talkers = await getTalkers();
+  const { q } = req.query;
+  if (!q) return res.status(200).json(talkers);
+  const talker = talkers.filter((oneTalker) => oneTalker.name.includes(q));
+  if (talker) return res.status(200).json(talker);
+  res.status(200).json(talkers);
+});
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
@@ -140,14 +149,6 @@ router.delete('/:id',
     const { id } = req.params;
     const talkers = await getTalkers();
     const newTalkers = talkers.filter((aTalker) => aTalker.id !== Number(id));
-    // if (!talker) {
-    //   return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
-    // }
-    // talkers.filter((oneTalker) => oneTalker.id !== talker.id);
-    // talker.name = name;
-    // talker.age = age;
-    // talker.talk = talk;
-    // talkers.push(talker);
     await fs.writeFile(path.resolve('src', 'talker.json'), JSON.stringify(newTalkers, null, 2));
     res.status(204).json({ ok: true });
   });
