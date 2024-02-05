@@ -111,4 +111,27 @@ router.get('/:id', async (req, res) => {
   res.status(200).json(talker);
 });
 
+router.put('/:id', 
+  validateUserLogged,
+  validateName, 
+  validateAge, 
+  validateTalk, 
+  validateWatched, 
+  validateRate, async (req, res) => {
+    const { id } = req.params;
+    const { name, age, talk } = req.body;
+    const talkers = await getTalkers();
+    const talker = talkers.find((aTalker) => aTalker.id === Number(id));
+    if (!talker) {
+      return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+    }
+    talkers.filter((oneTalker) => oneTalker.id !== talker.id);
+    talker.name = name;
+    talker.age = age;
+    talker.talk = talk;
+    talkers.push(talker);
+    await fs.writeFile(path.resolve('src', 'talker.json'), JSON.stringify(talkers, null, 2));
+    res.status(200).json(talker);
+  });
+
 module.exports = router;
