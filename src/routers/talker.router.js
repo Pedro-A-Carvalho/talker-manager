@@ -134,4 +134,22 @@ router.put('/:id',
     res.status(200).json(talker);
   });
 
+router.delete('/:id', 
+  validateUserLogged,
+  async (req, res) => {
+    const { id } = req.params;
+    const talkers = await getTalkers();
+    const newTalkers = talkers.filter((aTalker) => aTalker.id !== Number(id));
+    // if (!talker) {
+    //   return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+    // }
+    // talkers.filter((oneTalker) => oneTalker.id !== talker.id);
+    // talker.name = name;
+    // talker.age = age;
+    // talker.talk = talk;
+    // talkers.push(talker);
+    await fs.writeFile(path.resolve('src', 'talker.json'), JSON.stringify(newTalkers, null, 2));
+    res.status(204).json({ ok: true });
+  });
+
 module.exports = router;
