@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs/promises');
 const path = require('path');
+const connection = require('../db/connection');
 
 const router = express.Router();
 
@@ -107,6 +108,21 @@ router.get('/search', validateUserLogged, async (req, res) => {
   if (!q) return res.status(200).json(talkers);
   const talker = talkers.filter((oneTalker) => oneTalker.name.includes(q));
   if (talker) return res.status(200).json(talker);
+  res.status(200).json(talkers);
+});
+
+router.get('/db', async (req, res) => {
+  const [talkersRaw] = await connection.execute(
+    'select * from talkers',
+  );
+  const talkers = talkersRaw.map((talker) => ({
+    age: talker.age,
+    id: talker.id,
+    name: talker.name,
+    talk: {
+      rate: talker.talk_rate,
+      watchedAt: talker.talk_watched_at,
+    } }));
   res.status(200).json(talkers);
 });
 
